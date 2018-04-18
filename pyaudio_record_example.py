@@ -17,8 +17,12 @@ if len ( sys.argv ) != 2:
 	print("Usage: Type in output wavfile name")
 	sys.exit(1)
 
+
+
 WAVE_OUTPUT_FILENAME = sys.argv[1]
 
+print("Press enter to record note.")
+wait = sys.stdin.readline()
 
 p = pyaudio.PyAudio()
 
