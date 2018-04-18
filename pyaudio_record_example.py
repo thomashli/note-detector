@@ -4,13 +4,21 @@
 
 import pyaudio
 import wave
+import sys
+
 
 CHUNK = 1024
 FORMAT = pyaudio.paInt16
 CHANNELS = 2
 RATE = 44100
 RECORD_SECONDS = 1
-WAVE_OUTPUT_FILENAME = "output1.wav"
+
+if len ( sys.argv ) != 2:
+	print("Usage: Type in output wavfile name")
+	sys.exit(1)
+
+WAVE_OUTPUT_FILENAME = sys.argv[1]
+
 
 p = pyaudio.PyAudio()
 

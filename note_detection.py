@@ -1,14 +1,19 @@
+
+"""
+Sample code from stackexchange post:
+https://stackoverflow.com/questions/23377665/python-scipy-fft-wav-files?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+credit to eusoubrasileiro, Shenghui
+"""
+
 import pyaudio
 from scipy.io import wavfile as wf 
 import scipy
 from scipy.fftpack import fft
 import matplotlib.pyplot as plt 
 import numpy as np
-"""
-Sample code from stackexchange post:
-https://stackoverflow.com/questions/23377665/python-scipy-fft-wav-files?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
-credit to eusoubrasileiro, Shenghui
-"""
+import sys
+
+
 
 #tolerance variable is how close notes can stray from actual frequency. 
 tolerance_0 = .5 
@@ -31,7 +36,11 @@ notes = {
 }
 
 def main():
-	fs, data = wf.read('output1.wav')
+	if len ( sys.argv ) != 2:
+		print("Usage: Type in input wavfile name")
+		sys.exit(1)
+
+	fs, data = wf.read(sys.argv[1])
 	a = data.T[0] # this is a two channel soundtrack, I get the first track
 	b=[(ele/2**8.)*2-1 for ele in a] # this is 8-bit track, b is now normalized on [-1,1)
 	c = fft(b) # calculate fourier transform (complex numbers list)
