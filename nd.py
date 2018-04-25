@@ -95,8 +95,8 @@ def note_info(note):
 			'octave' : closestOctave, 
 			'intonation': intonation,
 			'graph': '['+''.join(tune_disp)+']',
-			'flow': round(closestFreq-tolerance*2),
-			'fhigh': round(closestFreq+tolerance*2)}
+			'flow': round(closestFreq-(tolerance*2)),
+			'fhigh': round(closestFreq+(tolerance*2))}
 
 	return info
 
@@ -112,7 +112,7 @@ def tuner(wav):
 	frqLabel = k/T
 	frqLabel = frqLabel[0:int(8000*T)]
 	frequency_magnitude_spectrum = abs(c[:(d-1)])[:len(frqLabel)]
-	frequency_magnitude_spectrum[0:5] = [0]*5
+	frequency_magnitude_spectrum[0:10] = [0]*10
 
 	#chord =  [i for i in range(len(frequency_magnitude_spectrum)) if frequency_magnitude_spectrum[i] > 20000]
 	#print(chord)
@@ -122,27 +122,33 @@ def tuner(wav):
 	plt.show()
 	
 	#find the note
-	note_mag = np.argmax(frequency_magnitude_spectrum)
+	max_mag = max(frequency_magnitude_spectrum)
+	max_ind = np.argmax(frequency_magnitude_spectrum)
+	num_iter = 0
+	visited = []
 
-	threshold = 40000
-	for i in range(2):
-		print(max(frequency_magnitude_spectrum))
-		plt.plot(frqLabel,frequency_magnitude_spectrum,'r')  
-		plt.show()
-		if (max(frequency_magnitude_spectrum) > threshold):
-			note = frqLabel[note_mag]
-			info = note_info(note)
-			if info:
+	threshold = max_mag / 5
+	while (max_mag > threshold):
+		if num_iter > 3:
+			return; 
+		note = frqLabel[max_ind]
+		info = note_info(note)
+		if info:
+			if not np.any(visited == info['note']):
 				print('Note: ', info['note'])
 				print('Octave: ', info['octave'])
 				print('Intonation: ', info['intonation'])
 				print('Grapher:', info['graph'])
+				visited.append(info['note']+str(info['octave']))
 
-				#filtering it out
-				flow = info['flow']
-				fhigh = info['fhigh']
-				print('filtering')
-				print(flow)
-				print(fhigh)
-				frequency_magnitude_spectrum[flow:fhigh] = [0]*(fhigh-flow)
-			note_mag = np.argmax(frequency_magnitude_spectrum)
+			#filtering it out
+			flow = info['flow']*T 
+			fhigh = info['fhigh']*T
+			if flow > fhigh:
+				flow, fhigh = fhigh, flow
+			frequency_magnitude_spectrum[int(flow-20):int(fhigh+20)] = [0]*(int(fhigh+20)-int(flow-20))
+			max_mag = max(frequency_magnitude_spectrum)
+			max_ind = np.argmax(frequency_magnitude_spectrum)
+		plt.plot(frqLabel,frequency_magnitude_spectrum,'r')  
+		plt.show()
+		num_iter += 1
