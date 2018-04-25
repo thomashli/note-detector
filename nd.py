@@ -37,7 +37,7 @@ note_names = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B']
 
 # finds closest note & octave & intonation 
 def note_info(note):
-	if note < 10:
+	if note < 16.35:
 		print('no note detected')
 		return 
 	elif note > 8500:
@@ -61,32 +61,47 @@ def note_info(note):
 
 	#finding intonation
 	nameInd = note_names.index(closestNote)
+	nextFlatter = note_names[(nameInd - 1) % len(note_names)]
+	nextSharper = note_names[(nameInd + 1) % len(note_names)]
+
+
+	flat_tolerance = (closestFreq - notes[nextFlatter][closestOctave])/4
+	sharp_tolerance = (notes[nextSharper][closestOctave] - closestFreq)/4
+	tolerance = (notes[nextSharper][closestOctave]-notes[nextFlatter][closestOctave])/2
+
+	tune_disp = list(str(' ') * 51)
+
+	pos = int(round(minDiff/tolerance*50)+23)
+	tune_disp[pos] = 'N'
+	tune_disp[25] = closestNote
+
+
 	if minDiff < 0:
-		nextFlatter = note_names[(nameInd - 1) % len(note_names)]
-		tolerance = (closestFreq - notes[nextFlatter][closestOctave])/4
-		if (minDiff < tolerance):
+		if (minDiff < flat_tolerance):
 			intonation = 'flat'
 		else:
 			intonation = 'in tune'
 	elif minDiff > 0:
-		nextSharper = note_names[(nameInd + 1) % len(note_names)]
-		tolerance = (notes[nextSharper][closestOctave] - closestFreq)/4
-		if (minDiff > tolerance):
+		if (minDiff > sharp_tolerance):
 			intonation = 'sharp'
 		else:
 			intonation = 'in tune'
 	else:
 		intonation = 'perfectly in tune'
 
+
+
 	info = {'note': closestNote, 
 			'octave' : closestOctave, 
-			'intonation': intonation}
+			'intonation': intonation,
+			'graph': '['+''.join(tune_disp)+']',
+			'flow': round(closestFreq-tolerance*2),
+			'fhigh': round(closestFreq+tolerance*2)}
 
 	return info
 
 def tuner(wav):
-	print("_______")
-	fs, data = wf.read(wav)
+	fs, data = wf.read("lala.wav")
 	a = data.T[0] # this is a two channel soundtrack, I get the first track
 	b=[(ele/2**8.)*2-1 for ele in a] # this is 8-bit track, b is now normalized on [-1,1)
 	c = fft(b) # calculate fourier transform (complex numbers list)
@@ -95,20 +110,39 @@ def tuner(wav):
 	k = scipy.arange(int(len(data)/2)-1)
 	T = len(data)/fs  # where fs is the sampling frequency
 	frqLabel = k/T
-	frequency_magnitude_spectrum = abs(c[:(d-1)])
-	
+	frqLabel = frqLabel[0:int(8000*T)]
+	frequency_magnitude_spectrum = abs(c[:(d-1)])[:len(frqLabel)]
+	frequency_magnitude_spectrum[0:5] = [0]*5
+
+	#chord =  [i for i in range(len(frequency_magnitude_spectrum)) if frequency_magnitude_spectrum[i] > 20000]
+	#print(chord)
+
 	#plot spectrum 
-	#plt.plot(frqLabel,frequency_magnitude_spectrum,'r')  
-	#plt.show()
+	plt.plot(frqLabel,frequency_magnitude_spectrum,'r')  
+	plt.show()
 	
 	#find the note
-	note = frqLabel[np.argmax(frequency_magnitude_spectrum)]
-	
-	# find_note(note)
-	# print("Your note is:",find_note(note))
+	note_mag = np.argmax(frequency_magnitude_spectrum)
 
-	info = note_info(note)
-	if info:
-		print('Note: ', info['note'])
-		print('Octave: ', info['octave'])
-		print('Intonation: ', info['intonation'])
+	threshold = 40000
+	for i in range(2):
+		print(max(frequency_magnitude_spectrum))
+		plt.plot(frqLabel,frequency_magnitude_spectrum,'r')  
+		plt.show()
+		if (max(frequency_magnitude_spectrum) > threshold):
+			note = frqLabel[note_mag]
+			info = note_info(note)
+			if info:
+				print('Note: ', info['note'])
+				print('Octave: ', info['octave'])
+				print('Intonation: ', info['intonation'])
+				print('Grapher:', info['graph'])
+
+				#filtering it out
+				flow = info['flow']
+				fhigh = info['fhigh']
+				print('filtering')
+				print(flow)
+				print(fhigh)
+				frequency_magnitude_spectrum[flow:fhigh] = [0]*(fhigh-flow)
+			note_mag = np.argmax(frequency_magnitude_spectrum)
