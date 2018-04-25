@@ -36,7 +36,7 @@ notes = {
 
 note_names = ['C','C#/D♭','D','D#/E♭','E','F','F#/G♭','G','G#/A♭','A','A#/B♭','B']
 
-threshold = 10000
+threshold = 1000
 
 # finds closest note & octave & intonation 
 def note_info(note):
@@ -100,7 +100,7 @@ def tuner(wav):
 	frqLabel = k/T
 
 	frequency_magnitude_spectrum = abs(c[:(d-1)])
-	for _ in range(5):
+	for _ in range(60):
 		frequency_magnitude_spectrum[_] = 0
 	#plot spectrum 
 	#plt.plot(frqLabel,frequency_magnitude_spectrum,'r')  
