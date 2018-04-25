@@ -132,6 +132,9 @@ def tuner(wav):
 	if threshold < 10000:
 		threshold = 10000
 	while (max_mag > threshold):
+		#plot spectrum 
+		#plt.plot(frqLabel,frequency_magnitude_spectrum,'r')  
+		#plt.show()
 		if num_iter > 3:
 			return; 
 		note = frqLabel[max_ind]
