@@ -29,7 +29,7 @@ notes = {
 	'G' : 		[24.5,49.0,98.,196.,392.,784.,1568.,3135.96,6271.93],
 	'G#' : 		[25.96,51.91,103.83,207.65,415.30,830.6,1661.2,3322.4,6644.88],
 	'A' : 		[27.5,55.0,110.0,220.,440.,880.,1760.,3520.,7040.],
-	'A#' : 		[14.568,29.135,58.270,116.541,233.082,466.164,932.328,1864.655,3729.310,7458.620],
+	'A#' : 		[29.135,58.270,116.541,233.082,466.164,932.328,1864.655,3729.310,7458.620],
 	'B' : 		[30.87,61.74,123.47,246.94,493.88,988.,1975.5,3951.07,7902.13]
 }
 
@@ -37,7 +37,7 @@ note_names = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B']
 
 # finds closest note & octave & intonation 
 def note_info(note):
-	if note < 16.35:
+	if note < 65:
 		print('no note detected')
 		return 
 	elif note > 8500:
@@ -101,6 +101,7 @@ def note_info(note):
 	return info
 
 def tuner(wav):
+	print("______")
 	fs, data = wf.read("lala.wav")
 	a = data.T[0] # this is a two channel soundtrack, I get the first track
 	b=[(ele/2**8.)*2-1 for ele in a] # this is 8-bit track, b is now normalized on [-1,1)
@@ -118,8 +119,8 @@ def tuner(wav):
 	#print(chord)
 
 	#plot spectrum 
-	plt.plot(frqLabel,frequency_magnitude_spectrum,'r')  
-	plt.show()
+	#plt.plot(frqLabel,frequency_magnitude_spectrum,'r')  
+	#plt.show()
 	
 	#find the note
 	max_mag = max(frequency_magnitude_spectrum)
@@ -127,7 +128,9 @@ def tuner(wav):
 	num_iter = 0
 	visited = []
 
-	threshold = max_mag / 5
+	threshold = max_mag / 3
+	if threshold < 10000:
+		threshold = 10000
 	while (max_mag > threshold):
 		if num_iter > 3:
 			return; 
@@ -149,6 +152,6 @@ def tuner(wav):
 			frequency_magnitude_spectrum[int(flow-20):int(fhigh+20)] = [0]*(int(fhigh+20)-int(flow-20))
 			max_mag = max(frequency_magnitude_spectrum)
 			max_ind = np.argmax(frequency_magnitude_spectrum)
-		plt.plot(frqLabel,frequency_magnitude_spectrum,'r')  
-		plt.show()
+		#plt.plot(frqLabel,frequency_magnitude_spectrum,'r')  
+		#plt.show()
 		num_iter += 1
