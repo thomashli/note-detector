@@ -36,7 +36,7 @@ notes = {
 
 note_names = ['C','C#/D♭','D','D#/E♭','E','F','F#/G♭','G','G#/A♭','A','A#/B♭','B']
 
-threshold = 1000
+#threshold = 1000
 
 # finds closest note & octave & intonation 
 def note_info(note):
@@ -87,7 +87,7 @@ def note_info(note):
 
 	return info
 
-def tuner(wav):
+def tuner(wav, threshold):
 	print("_______")
 	fs, data = wf.read(wav)
 	a = data.T[0] # this is a two channel soundtrack, I get the first track
