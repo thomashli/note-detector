@@ -8,6 +8,8 @@ Example Usage:
 python3 note_detection.py input.wav
 """
 
+#template"
+
 import pyaudio
 from scipy.io import wavfile as wf 
 import scipy
