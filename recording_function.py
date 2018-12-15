@@ -1,4 +1,8 @@
 
+"""
+Sample script from: https://people.csail.mit.edu/hubert/pyaudio/
+"""
+
 import pyaudio
 import wave
 import sys

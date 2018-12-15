@@ -1,11 +1,11 @@
 
 """
-Sample code from stackexchange post:
+Sampled code from stackexchange post:
 https://stackoverflow.com/questions/23377665/python-scipy-fft-wav-files?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
 credit to eusoubrasileiro, Shenghui
 
 Example Usage:
-python3 note_detection.py input.wav
+python3 note_detection.py note.wav
 """
 
 import pyaudio
